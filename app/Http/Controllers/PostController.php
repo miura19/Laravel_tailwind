@@ -15,7 +15,9 @@ class PostController extends Controller
      */
     public function index()
     {
-        //
+        $posts = Post::orderBy('created_at', 'desc')->get();
+        $user = auth()->user();
+        return view('post.index',compact('posts','user'));
     }
 
     /**
@@ -25,6 +27,17 @@ class PostController extends Controller
      */
     public function create()
     {
+        // for($i=1; $i<=100; $i++){
+        //     if ($i % 15 === 0){
+        //         echo $i.'-'.'15の倍数'.'FizzBuzz!'.'<br>';
+        //     } elseif($i % 5 === 0){
+        //         echo $i.'-'.'5の倍数'.'Buzz!'.'<br>';
+        //     } elseif($i % 3 === 0){
+        //         echo $i.'-'.'3の倍数'.'Fizz!'.'<br>';
+        //     } else {
+        //         echo $i.'<br>';
+        //     }
+        // }
         return view('post.create');
     }
 
@@ -40,8 +53,15 @@ class PostController extends Controller
         $post->title = $request->input('title');
         $post->body = $request->input('body');
         $post->user_id = auth()->user()->id;
+
+        if ($request->file('image')){
+            $original = request()->file('image')->getClientOriginalName();
+            $name = date('Ymd_His').'_'.$original;
+            $post->image = $name;
+            request()->file('image')->storeAs('public/images', $name);
+        };
         $post->save();
-        return back()->with('message', '投稿を作成しました!');;
+        return back()->with('message', '投稿を作成しました!');
     }
 
     /**
@@ -52,7 +72,7 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        //
+        return view('post.show',compact('post'));
     }
 
     /**
@@ -63,7 +83,7 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        return view('post.edit',compact('post'));
     }
 
     /**
@@ -73,9 +93,19 @@ class PostController extends Controller
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Post $post)
+    public function update(PostRequest $request, Post $post)
     {
-        //
+        $post->title = $request->input('title');
+        $post->body = $request->input('body');
+
+        if ($request->file('image')){
+            $original = request()->file('image')->getClientOriginalName();
+            $name = date('Ymd_His').'_'.$original;
+            $post->image = $name;
+            request()->file('image')->storeAs('public/images', $name);
+        };
+        $post->save();
+        return back()->with('message', '投稿を更新しました!');
     }
 
     /**
@@ -86,6 +116,7 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        $post->delete();
+        return redirect()->route('post.index')->with('message','投稿を削除しました！！');
     }
 }

@@ -25,6 +25,11 @@ Route::get('/dashboard', function () {
 Route::group(['prefix' => 'post','middleware' => 'auth'], function () {
     Route::get('create',[PostController::class,'create'])->name('post.create');
     Route::post('store',[PostController::class,'store'])->name('post.store');
+    Route::get('index',[PostController::class,'index'])->name('post.index');
+    Route::get('show/{post}',[PostController::class,'show'])->name('post.show');
+    Route::get('edit/{post}',[PostController::class,'edit'])->name('post.edit');
+    Route::patch('update/{post}',[PostController::class,'update'])->name('post.update');
+    Route::delete('delete/{post}',[PostController::class,'destroy'])->name('post.destroy');
 });
 
 require __DIR__.'/auth.php';
